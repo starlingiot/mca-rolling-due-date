@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}
+    {{ block.super }} :: Login
+{% endblock title %}
+
+{% block content %}
+    <div class="row justify-content-md-center">
+
+        <div class="col col-md-4"></div>
+
+        <div class="col-md-auto">
+            <h2>Login</h2>
+            <form method="post">
+                <div class="form-group">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                </div>
+                <button type="submit" class="btn btn-primary btn-sm">Login</button>
+            </form>
+        </div>
+
+        <div class="col col-md-4"></div>
+
+        <div class="col">
+
+        </div>
+
+    </div>
+{% endblock content %}

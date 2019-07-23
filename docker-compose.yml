@@ -1,0 +1,16 @@
+version: '3'
+
+services:
+  django:
+    build:
+      dockerfile: compose/django/Dockerfile
+      context: .
+    command: python manage.py runserver 0.0.0.0:8000
+    volumes:
+      - db-storage:/code
+    ports:
+      - "80:8000"
+
+
+volumes:
+  db-storage:

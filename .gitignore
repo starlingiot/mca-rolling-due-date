@@ -1,0 +1,7 @@
+*.sqlite3
+
+.idea/*
+exports/*
+site/*
+venv/*
+docs/*

@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div>
+        <h1>{{ object.lab_id }}</h1>
+        {% if object.rush_job %}<span class="badge badge-danger">Rush</span>{% endif %}
+        {% if object.from_combo %}<span class="badge badge-secondary">502/LEAF</span>{% endif %}
+
+        <hr/>
+
+        <div class="row">
+
+            <div class="col-md">
+                <h4>{{ order.sample.name }} for {{ order.client.name }}</h4>
+                <p class="text-muted">{{ order.matrice }}</p>
+                <p><span class="font-weight-bold">Due Date: </span>{{ object.due_date|date:"d M Y" }}</p>
+                <p><span class="font-weight-bold">Reported Date: </span>{{ object.reported_date|date:"d M Y" }}</p>
+                <p><span class="font-weight-bold">COA URL: </span><a href="{{ order.coa_url }}">{{ order.coa_url }}</a>
+                </p>
+            </div>
+
+            <div class="col-md">
+                <h4 class="text-muted">Notes</h4>
+                <ul class="list-group">
+                    {% for note in object.notes.all %}
+                        <li class="list-group-item"><span class="text-muted"
+                                                          style="font-size: 0.7em; padding-right: 10px;">
+                            <em>{{ note.created|date:"d M Y" }}</em></span>{{ note.text }}
+                            <button class="btn btn-sm" data-toggle="modal" data-target="#noteModal"
+                                    data-lab-id="{{ order.lab_id }}" data-note-id="{{ note.id }}"
+                                    data-text="{{ note.text }}" style="background-color: #ffffff">
+                                <img src="{% static '/open-iconic/svg/pencil.svg' %}" alt="edit note"/>
+                            </button>
+                        </li>
+                    {% endfor %}
+                </ul>
+
+                <button class="btn btn-sm" data-toggle="modal" data-target="#noteModal"
+                        data-lab-id="{{ order.lab_id }}" style="margin-top: 10px;">
+                    <img src="{% static '/open-iconic/svg/plus.svg' %}" alt="add note"/>
+                </button>
+            </div>
+
+            <div class="col-md">
+                <h4 class="text-muted">Tests</h4>
+                <ul class="list-group">
+                    {% for test in object.tests.all %}
+                        <li class="list-group-item"><span
+                                style="color: #{{ test.test_type.default_color }}; margin-right: 10px;"
+                                class="font-weight-bold">{{ test.test_type.long_name }}</span>
+                            {% if test.executed_date %} - {{ test.executed_date|date:"d M Y" }}{% else %}
+                                <span style="font-size: 0.8em"><em>unfinished</em></span>{% endif %}</li>
+                    {% endfor %}
+                </ul>
+            </div>
+
+        </div>
+
+        <hr/>
+
+        <a href="{% url 'orders:rolling-due-date' %}"><span style="font-size: 0.8em"><< back</span></a>
+
+        {% include "orders/_note_modal.html" %}
+
+    </div>
+{% endblock content %}
+
+{% block extrajs %}
+    <script src="{% static 'js/notes.js' %}"></script>
+{% endblock extrajs %}

@@ -1,0 +1,90 @@
+{% extends "base.html" %}
+{% load static %}
+
+{% block content %}
+    <div>
+        <div class="row">
+            <div class="col-md">
+                <h1>Due Date List</h1>
+
+                <p>
+                    <span class="text-danger">Red</span> is a rush job.<br/>
+                    <span style="background-color: lightgray">Gray highlighted</span> is I-502 / report to LEAF
+                    sample.
+                </p>
+            </div>
+
+            <div class="col-md">
+                <span class="text-muted text-bold">Upload New Report</span>
+                <form action="{% url 'orders:rolling-due-date' %}" enctype="multipart/form-data" method="post"
+                      style="border-top: lightgray 1px dashed">
+                    <div class="form-group">
+                        {% csrf_token %}
+                        {{ upload_form }}
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload</button>
+                </form>
+            </div>
+        </div>
+
+            <table class="table table-sm table-hover" style="margin-top: 25px;">
+                <thead>
+                <tr>
+                    <th scope="col">Date Due</th>
+                    <th scope="col">3-Day TAT Date</th>
+                    <th scope="col">Laboratory ID</th>
+                    <th scope="col" style="color: #{{ colors.CAN }}">Potency</th>
+                    <th scope="col" style="color: #{{ colors.MIC }}">Microbial</th>
+                    <th scope="col" style="color: #{{ colors.MYC }}">Mycotoxin</th>
+                    <th scope="col" style="color: #{{ colors.WA }}">Wa / Moi.</th>
+                    <th scope="col" style="color: #{{ colors.TER }}">Terpenes</th>
+                    <th scope="col" style="color: #{{ colors.RES }}">Solvents</th>
+                    <th scope="col" style="color: #{{ colors.PET }}">Pesticides</th>
+                    <th scope="col" style="color: #{{ colors.MET }}">HMs</th>
+                    <th scope="col">Client Name</th>
+                    <th scope="col">Notes</th>
+                </tr>
+                </thead>
+
+                <tbody>
+                {% for order in object_list %}
+                    <tr {% if order.from_combo %}style="background-color: lightgray"{% endif %}>
+                        <td {% if order.rush_job %}style="color: red"{% endif %}>{{ order.due_date|date:"n/d/Y" }}</td>
+                        <td>{{ order.three_day_tat_date|date:"n/d/Y" }}</td>
+                        <td {% if order.rush_job %}style="color: red"{% endif %}><a
+                                href="{% url 'orders:order-detail' order.pk %}">{{ order.lab_id }}</a></td>
+                        <td style="color: #{{ colors.CAN }}">{% if order.can %} X {% endif %}</td>
+                        <td style="color: #{{ colors.MIC }}">{% if order.mic %} X {% endif %}</td>
+                        <td style="color: #{{ colors.MYC }}">{% if order.myc %} X {% endif %}</td>
+                        <td style="color: #{{ colors.WA }}">{% if order.wa %} X {% endif %}</td>
+                        <td style="color: #{{ colors.TER }}">{% if order.ter %} X {% endif %}</td>
+                        <td style="color: #{{ colors.RES }}">{% if order.res %} X {% endif %}</td>
+                        <td style="color: #{{ colors.PET }}">{% if order.pet %} X {% endif %}</td>
+                        <td style="color: #{{ colors.MET }}">{% if order.met %} X {% endif %}</td>
+                        <td>{{ order.client.name }}</td>
+                        <td>
+                            <ul class="list-unstyled" style="margin-bottom: 0;">
+                                {% for note in order.notes.all %}
+                                    <li style="font-size: 0.8em;">{{ note.text }}</li>{% endfor %}
+                                <li>
+                                    <button class="btn btn-sm" data-toggle="modal" data-target="#noteModal"
+                                            data-lab-id="{{ order.lab_id }}">
+                                        <img src="{% static '/open-iconic/svg/plus.svg' %}" alt="add note"/>
+                                    </button>
+                                </li>
+                            </ul>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </tbody>
+            </table>
+
+        {% include "orders/_note_modal.html" %}
+
+    </div>
+{% endblock content %}
+
+
+{% block extrajs %}
+    <script src="{% static 'js/notes.js' %}"></script>
+{% endblock extrajs %}
